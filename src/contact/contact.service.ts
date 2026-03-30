@@ -10,6 +10,10 @@ export class ContactService {
     const port = Number(process.env.SMTP_PORT) || 25;
     const useSecure = process.env.SMTP_SECURE === 'true' || port === 465;
     const host = process.env.SMTP_HOST || '127.0.0.1';
+    const connectionTimeout = Number(process.env.SMTP_CONNECTION_TIMEOUT || 20000);
+    const greetingTimeout = Number(process.env.SMTP_GREETING_TIMEOUT || 15000);
+    const socketTimeout = Number(process.env.SMTP_SOCKET_TIMEOUT || 20000);
+    const requireTLS = process.env.SMTP_REQUIRE_TLS !== 'false';
 
     // eslint-disable-next-line no-console
     console.log(`📧 SMTP sozlamalari: ${host}:${port}, secure: ${useSecure}`);
@@ -27,13 +31,13 @@ export class ContactService {
         minVersion: 'TLSv1',
         maxVersion: 'TLSv1.3',
       },
-      requireTLS: true,
+      requireTLS: requireTLS,
       ignoreTLS: false,
       logger: process.env.NODE_ENV === 'development',
       debug: process.env.NODE_ENV === 'development',
-      connectionTimeout: 300000,
-      greetingTimeout: 120000,
-      socketTimeout: 300000,
+      connectionTimeout: connectionTimeout,
+      greetingTimeout: greetingTimeout,
+      socketTimeout: socketTimeout,
       pool: false,
       maxConnections: 1,
       maxMessages: 1,

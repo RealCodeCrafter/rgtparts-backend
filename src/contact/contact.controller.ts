@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, ServiceUnavailableException } from '@nestjs/common';
 import { ContactService } from './contact.service';
 import { CreateContactDto } from './dto/create-contact.dto';
 
@@ -8,15 +8,17 @@ export class ContactController {
 
   @Post()
   async submit(@Body() createContactDto: CreateContactDto) {
-    this.contactService.sendEmailAsync(createContactDto).catch((error) => {
-      // eslint-disable-next-line no-console
-      console.error('Background email yuborishda xato:', error);
-    });
-
-    return {
-      success: true,
-      message: 'Xabar qabul qilindi va yuborilmoqda!',
-    };
+    try {
+      await this.contactService.sendEmail(createContactDto);
+      return {
+        success: true,
+        message: 'Xabar muvaffaqiyatli yuborildi!',
+      };
+    } catch (error: any) {
+      throw new ServiceUnavailableException(
+        `Email yuborilmadi: ${error?.message || "Noma'lum xato"}`,
+      );
+    }
   }
 }
 
